@@ -76,7 +76,7 @@ public class UserController {
             String username = data.getUsername();
             String password = data.getPassword();
             Optional<User> user = userRepository.findByUsername(data.getUsername());
-            if (user != null) {
+            if (!user.isEmpty()) {
                 throw new UserAlreadyExists();
             }
             userRepository.save(User.builder()
