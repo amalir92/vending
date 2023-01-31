@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.mvp.vending.exception.InvalidProductException;
 import com.mvp.vending.exception.NotEnoughDeposit;
 import com.mvp.vending.exception.NotValidCoinsException;
 import com.mvp.vending.exception.NotValidProductCost;
@@ -40,7 +41,12 @@ public class VendingServiceImpl implements VendingService {
         Output out = null;
         if (transaction.getProductId() != null) {
             Optional<Product> product = productRepository.findById(transaction.getProductId());
-            if (product != null && product.get().getAmountAvailable() > transaction.getAmount()) {
+            if(!product.isPresent())
+            {
+                throw new InvalidProductException();
+            }
+            if (product.get().getAmountAvailable() > transaction.getAmount()) 
+            {
                 totalCost = totalCost + product.get().getProductCost() * transaction.getAmount();
             }
 
