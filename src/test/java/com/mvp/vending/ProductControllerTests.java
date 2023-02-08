@@ -60,7 +60,7 @@ class ProductControllerTests {
   @Test
   void removeProductTest() throws Exception {
 
-    AuthenticationRequest request = new AuthenticationRequest("admin1", "password");
+    AuthenticationRequest request = new AuthenticationRequest("admin2", "password");
 
     MvcResult result = mockMvc.perform(post("/vending/user/signin")
         .contentType(MediaType.APPLICATION_JSON)

@@ -2,14 +2,17 @@ package com.mvp.vending.controller;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import com.mvp.vending.exception.UserAlreadyExists;
+import com.mvp.vending.exception.UserAlreadySignedIn;
 import com.mvp.vending.model.Output;
 import com.mvp.vending.model.Transaction;
 import com.mvp.vending.model.User;
 import com.mvp.vending.repository.UserRepository;
+import com.mvp.vending.security.ActiveUserStore;
 import com.mvp.vending.security.JwtTokenProvider;
 import com.mvp.vending.service.VendingService;
 
@@ -21,8 +24,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -52,6 +57,9 @@ public class UserController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    ActiveUserStore activeUserStore;
+
     @PostMapping("/signin")
     public ResponseEntity signin(@RequestBody AuthenticationRequest data) {
 
@@ -61,12 +69,34 @@ public class UserController {
             String token = jwtTokenProvider.createToken(username, this.userRepository.findByUsername(username)
                     .orElseThrow(() -> new UsernameNotFoundException("Username " + username + "not found")).getRoles());
 
+            List<String> activeUsers = activeUserStore.getActiveUsers();
+
+            if (activeUsers.contains(username)) {
+                throw new UserAlreadySignedIn();
+            }
+            System.out.println(activeUsers);
+            activeUsers.add(username);
+            activeUserStore.setActiveUsers(activeUsers);
             Map<Object, Object> model = new HashMap<>();
             model.put("token", token);
             return ok(token);
-        } catch (AuthenticationException e) {
+        } catch (BadCredentialsException e) {
             throw new BadCredentialsException("Invalid username/password supplied");
         }
+    }
+
+    @PostMapping("/logout/{username}")
+    public String logout(@PathVariable String username) {
+
+        List<String> activeUsers = activeUserStore.getActiveUsers();
+
+        if (activeUsers.contains(username)) {
+            activeUsers.remove(username);
+        }
+
+        SecurityContextHolder.getContext().setAuthentication(null);
+
+        return "user/signin";
     }
 
     @PostMapping("/signup")
@@ -111,7 +141,7 @@ public class UserController {
     @PostMapping("/buy/{username}")
     @ResponseStatus(HttpStatus.OK)
     Output buyProducts(@RequestBody Transaction transaction, @PathVariable String username) throws Exception {
-    return vendingService.buyProducts(transaction, username);
-  }
+        return vendingService.buyProducts(transaction, username);
+    }
 
 }

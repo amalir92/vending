@@ -6,7 +6,6 @@ import com.mvp.vending.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -21,14 +20,14 @@ public class SpringSecurtyConfig extends WebSecurityConfigurerAdapter {
     JwtTokenProvider jwtTokenProvider;
 
     private static final String[] SWAGGER_WHITELIST = {
-        "/v2/api-docs",
-        "/v3/api-docs",
-        "/configuration/ui",
-        "/swagger-resources/**",
-        "/configuration/security",
-        "/swagger-ui.html",
-        "/swagger-ui**/",
-        "/webjars/**"
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/configuration/ui",
+            "/swagger-resources/**",
+            "/configuration/security",
+            "/swagger-ui.html",
+            "/swagger-ui**/",
+            "/webjars/**"
     };
 
     @Bean
@@ -36,16 +35,17 @@ public class SpringSecurtyConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/v2/api-docs",
-                                   "/v3/api-docs",
-                                   "/configuration/ui",
-                                   "/swagger-resources/**",
-                                   "/configuration/security",
-                                   "/swagger-ui.html",
-                                   "/swagger-ui**/",
-                                   "/webjars/**");
+                "/v3/api-docs",
+                "/configuration/ui",
+                "/swagger-resources/**",
+                "/configuration/security",
+                "/swagger-ui.html",
+                "/swagger-ui**/",
+                "/webjars/**");
     }
 
     @Override
@@ -59,6 +59,7 @@ public class SpringSecurtyConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(SWAGGER_WHITELIST).permitAll()
                 .antMatchers("/vending/user/signin").permitAll()
                 .antMatchers("/vending/user/signup").permitAll()
+                .antMatchers("/vending/user/logout/**").permitAll()
                 .antMatchers("/vending/product/all").permitAll()
                 .antMatchers("/vending/product/add").hasRole("SELLER")
                 .antMatchers("/vending/product/update**").hasRole("SELLER")
@@ -73,8 +74,4 @@ public class SpringSecurtyConfig extends WebSecurityConfigurerAdapter {
                 .apply(new JwtSecurityConfigurer(jwtTokenProvider));
     }
 
-    
-
 }
-
-

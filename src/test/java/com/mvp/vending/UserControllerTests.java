@@ -67,7 +67,7 @@ public class UserControllerTests {
 
     @Test
     void resetDeposit() throws Exception {
-        AuthenticationRequest request = new AuthenticationRequest("user1", "password");
+        AuthenticationRequest request = new AuthenticationRequest("user3", "password");
 
         MvcResult result = mockMvc.perform(post("/vending/user/signin")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -79,14 +79,12 @@ public class UserControllerTests {
         String replaced = response.replace("{\"token\": \"", "");
         String token = replaced.replace("\"}", "");
 
-        
-
-        mockMvc.perform(post("/vending/user/reset/user1")
+        mockMvc.perform(post("/vending/user/reset/user3")
                 .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         
-        Optional<User> user1 = userRepository.findByUsername("user1");
+        Optional<User> user1 = userRepository.findByUsername("user3");
         assertThat(user1.get().getDeposit()).isEqualTo(0);
 
     }
@@ -94,7 +92,7 @@ public class UserControllerTests {
     @Test
   void productBuyTest() throws Exception {
 
-    AuthenticationRequest request = new AuthenticationRequest("user1", "password");
+    AuthenticationRequest request = new AuthenticationRequest("user2", "password");
 
     MvcResult result = mockMvc.perform(post("/vending/user/signin")
         .contentType(MediaType.APPLICATION_JSON)
@@ -106,14 +104,14 @@ public class UserControllerTests {
     Transaction transaction = new Transaction(new ProductId("001", "s001"), 1);
     Integer[] coins = { 50, 20, 50, 10 };
 
-    mockMvc.perform(post("/vending/user/deposit/user1")
+    mockMvc.perform(post("/vending/user/deposit/user2")
         .header("Authorization", "Bearer " + token)
         .contentType("application/json")
         .content(objectMapper.writeValueAsString(coins)))
         .andExpect(status().isOk());
 
 
-    mockMvc.perform(post("/vending/user/buy/user1")
+    mockMvc.perform(post("/vending/user/buy/user2")
         .header("Authorization", "Bearer " + token)
         .contentType("application/json")
         .content(objectMapper.writeValueAsString(transaction)))

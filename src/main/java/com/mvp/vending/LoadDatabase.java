@@ -38,9 +38,24 @@ class LoadDatabase {
           .password(passwordEncoder.encode("password"))
           .roles(Arrays.asList("BUYER"))
           .build()));
+      log.info("PreLoading " + userRepository.save(User.builder()
+          .username("user2")
+          .password(passwordEncoder.encode("password"))
+          .roles(Arrays.asList("BUYER"))
+          .build()));
+      log.info("PreLoading " + userRepository.save(User.builder()
+          .username("user3")
+          .password(passwordEncoder.encode("password"))
+          .roles(Arrays.asList("BUYER"))
+          .build()));
 
       log.info("PreLoading " + userRepository.save(User.builder()
           .username("admin1")
+          .password(passwordEncoder.encode("password"))
+          .roles(Arrays.asList("SELLER"))
+          .build()));
+      log.info("PreLoading " + userRepository.save(User.builder()
+          .username("admin2")
           .password(passwordEncoder.encode("password"))
           .roles(Arrays.asList("SELLER"))
           .build()));

@@ -52,7 +52,7 @@ public class ProductController {
   @DeleteMapping("/remove/{productId}/{sellerId}")
   @ResponseStatus(HttpStatus.OK)
   void removeProduct(@PathVariable String productId, @PathVariable String sellerId) throws Exception {
-      vendingService.removeProducts(productId, sellerId);
+    vendingService.removeProducts(productId, sellerId);
   }
 
   @PutMapping("/update/{productId}/{sellerId}")
